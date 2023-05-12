@@ -1729,7 +1729,7 @@ class ParserElement(ABC):
         return self
 
     def set_whitespace_chars(
-        self, chars: Union[Set[str], str], copy_defaults: bool = False
+        self, chars: Union[Set[str], str], copy_defaults: bool = False, recursive: bool = False
     ) -> "ParserElement":
         """
         Overrides the default whitespace chars
@@ -1737,6 +1737,9 @@ class ParserElement(ABC):
         self.skipWhitespace = True
         self.whiteChars = set(chars)
         self.copyDefaultWhiteChars = copy_defaults
+        if recursive and hasattr(self, 'exprs') and self.exprs is not None:
+            for expr in self.exprs:
+                expr.set_whitespace_chars(chars, copy_defaults=copy_defaults, recursive=recursive)
         return self
 
     def parse_with_tabs(self) -> "ParserElement":

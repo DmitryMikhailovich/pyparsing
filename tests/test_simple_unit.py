@@ -687,6 +687,30 @@ class TestWhitespaceMethods(PyparsingExpressionTestCase):
         #     text=" foo",
         #     expected_list=[]
         # ),
+        PpTestSpec(
+            desc="Three words foo separated by whitespace",
+            expr=(pp.Literal("foo").set_whitespace_chars(' '))[3, ...],
+            text=" foo  foo  foo  ",
+            expected_list=["foo", "foo", "foo"]
+        ),
+        PpTestSpec(
+            desc="Three words foo separated by new line, but only whitespace is not significant",
+            expr=(pp.Literal("foo").set_whitespace_chars(' '))[3, ...],
+            text=" foo\nfoo\nfoo  ",
+            expected_fail_locn=4
+        ),
+        PpTestSpec(
+            desc="If we recursively override whitespace chars on parent, then it's direct children should have overriden whitespace chars",
+            expr=(pp.Literal("foo")[3, ...]).set_whitespace_chars(' ', recursive=True),
+            text=" foo\nfoo\nfoo  ",
+            expected_fail_locn=4
+        ),
+        PpTestSpec(
+            desc="If we recursively override whitespace chars on parent, then all of it's descendants should have overriden whitespace chars",
+            expr=("(" + (pp.Literal("foo") + pp.Literal("bar")) + ")").set_whitespace_chars(' ', recursive=True),
+            text=" ( foo\nbar  ) ",
+            expected_fail_locn=6
+        ),
     ]
 
 
